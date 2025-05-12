@@ -37,3 +37,36 @@ exports.loginUser = async (req, res) => {
     res.status(500).json({ message: 'Login failed', error: error.message });
   }
 };
+
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await prisma.user.findMany();
+    res.json(users);  // Return the users as a response
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error fetching users', error });
+  }
+};
+
+
+exports.getUserById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: parseInt(id), // Ensure ID is an integer
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error('Error fetching user by ID:', error);
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
